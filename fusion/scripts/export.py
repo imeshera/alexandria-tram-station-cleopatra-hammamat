@@ -1,7 +1,7 @@
-# Published exports (models/): STEP (AP214) and F3D, both WITHOUT the calibrated canvases (third-party imagery)
-# and without the hidden 'Library' occurrence (its definitions stay alive through the placed instances).
-# Both are removed in memory only; the document is then closed WITHOUT saving and reopened, so the stored design
-# keeps its underlays. Save the document before running this.
+# Published exports (models/): STEP (AP214) and F3D, both WITHOUT the calibrated canvases (third-party imagery).
+# The 'Library' occurrence must stay (deleting it deletes the definition components and every instance with
+# them); it is hidden, and hidden occurrences are left out of the STEP. The canvases are removed in memory only;
+# the document is then closed WITHOUT saving and reopened, so the stored design keeps its underlays. Save the document before running this.
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import importlib, common
@@ -22,7 +22,7 @@ def run(_context: str):
         root.canvases.item(i).deleteMe()
     lib = common.root_occ(design, 'Library')
     if lib:
-        lib.deleteMe()
+        lib.isLightBulbOn = False
     em = design.exportManager
     step = os.path.join(OUT, common.DOC_NAME + '.step')
     f3d = os.path.join(OUT, common.DOC_NAME + '.f3d')

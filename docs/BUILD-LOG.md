@@ -59,8 +59,8 @@ Decisions, measurements and Fusion API gotchas, in the order they happened.
   colonnade sits on its satellite band; the NE band lies ≈ 2–3 m further north-west than the model (axes 14 ± 2 m
   apart in the imagery vs 11.3 m modelled).
 - Dome rise lowered 2.05 → 1.85 m (0.65 × lip) after comparing with the from-below frames; upper dome 1.65 m.
-- Exports: `export.py` deletes the canvases and the Library occurrence in memory, writes STEP and F3D, closes the
-  document without saving and reopens it (the stored design keeps its underlay). F3D image check: none.
+- Exports: `export.py` deletes the canvases in memory, writes STEP and F3D, closes the document without saving and
+  reopens it (the stored design keeps its underlay). F3D image check: none.
 - Renders: `render_views.py` (viewport, canvases hidden) → `docs/renders/2026-10-17_*.png`.
 
 ## 2026-10-17 — Pass 2: urn canopies, cartouche, scale render
@@ -78,3 +78,11 @@ Decisions, measurements and Fusion API gotchas, in the order they happened.
   bowls (3.8 m above rail), as in the 2024 frames with cars at the platform (3nKi0T8XbfM).
 - Pattern for long MCP calls: the script writes a flag file at the end; the shell waits for the flag
   (`until [ -f flag ]`) instead of guessing a sleep.
+
+## 2026-10-17 — Export fix
+- **Gotcha:** deleting the hidden *Library* occurrence before export (to keep the definitions out of the STEP)
+  deleted the definition components and **every instance of them** — the pass-1/pass-2 exports held only the
+  platforms, track and street (5 products, planar faces only). The Library now stays; hidden occurrences are left out
+  of the STEP anyway. Corrected exports: STEP 26 MB, 599 solids, full assembly structure (Station Side ×2 →
+  Canopy Module ×6, Tall Module, Frame, Column, 142 Balusters…); F3D 11 MB, no images.
+- Check exports by counting `MANIFOLD_SOLID_BREP` and `NEXT_ASSEMBLY_USAGE_OCCURRENCE` in the STEP, not by size.

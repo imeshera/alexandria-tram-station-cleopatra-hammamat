@@ -1,0 +1,155 @@
+# Cast reinforced-concrete bell / half-dome canopies (revolved shells), as instancing definitions:
+#   "Canopy"        lower canopy: moulded lip band with dentils + ovolo, hollow pot-shaped dome (concave soffit
+#                   seen from below), raised lotus lappets hanging from the crown, crown ring with cornice, finial.
+#   "Drum"          lower tier of the two-tier unit: same lip, vertical drum wall with a dentilled cornice and a
+#                   flat deck carrying the colonnettes; vaulted soffit underneath.
+#   "Upper Canopy"  the two-tier unit's upper dome (smaller lip, taller finial).
+# Local frame: origin at the centre of the lip bottom (= top of the entablature), Y up.
+import os, sys, math
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import importlib, common
+importlib.reload(common)
+from common import box, vcyl, cyl, sphere, torus, union_all, moved, rot_about, compose, mat, tbm, P3
+import adsk.core, adsk.fusion
+
+
+def lip_segments(R, lh, lt):
+    """Outer lip profile from the inner bottom corner up to the top ledge (r, y)."""
+    return [
+        ('P', (R - lt, 0)),
+        ('P', (R - 1.5, 0)),
+        ('S', [(R - 0.3, 0.06 * lh), (R - 0.8, 0.16 * lh)]),     # bottom bead
+        ('P', (R - 3.2, 0.20 * lh)),
+        ('P', (R - 3.2, 0.64 * lh)),                              # recessed dentil zone
+        ('P', (R - 1.8, 0.68 * lh)),
+        ('S', [(R + 0.2, 0.80 * lh), (R - 1.2, 0.95 * lh)]),      # ovolo
+        ('P', (R - 1.2, lh)),
+    ]
+
+
+def dentil_ring(R, y0, y1, depth=2.6, w=4.0, gap=2.6):
+    n = int(2 * math.pi * (R - 3.2) // (w + gap))
+    proto = box(R - 3.6, R - 3.2 + depth, y0, y1, -w / 2, w / 2)
+    parts = [moved(proto, rot_about((0, 1, 0), 2 * math.pi * i / n)) for i in range(n)]
+    return union_all(parts)
+
+
+def dome_points(R0, Rc, y0, hd):
+    """Pot/bell outer profile from the lip ledge (R0, y0) to the crown ring foot (Rc, y0 + hd)."""
+    return [(R0 + 0.010 * R0, y0 + 0.18 * hd), (R0 - 0.035 * R0, y0 + 0.42 * hd),
+            (R0 - 0.17 * R0, y0 + 0.68 * hd), (Rc + 0.11 * R0, y0 + 0.90 * hd), (Rc, y0 + hd)]
+
+
+def lappets(comp, R0, Rc, y0, hd, n=8, proud=2.0):
+    """Raised pointed 'lotus' lappets hanging from the crown: a 2 cm skin over the upper dome, trimmed by a
+    plan-view pattern of triangles (down-pointing on the dome = radial wedges in plan)."""
+    pts = dome_points(R0, Rc, y0, hd)
+    up = pts[1:]                                 # from 0.42 hd to the crown foot
+    outer = [(r + proud * 1.1, y + proud * 0.5) for (r, y) in up]
+    inner = [(r - 1.5, y - 0.6) for (r, y) in up]
+    segs = [('P', inner[0]), ('P', outer[0]), ('S', outer[1:]), ('P', inner[-1]), ('S', inner[-2::-1])]
+    skin = common.revolve_profile(comp, segs, 'lappet skin')[0]
+    # trim: keep only the wedges
+    keep = None
+    tip_r = up[0][0] + 2
+    for k in range(n):
+        a = 2 * math.pi * k / n
+        d = math.pi / n * 0.78
+        base_r = Rc * 0.92
+        tri = [(base_r * math.cos(a - d), base_r * math.sin(a - d)),
+               (tip_r * math.cos(a), tip_r * math.sin(a)),
+               (base_r * math.cos(a + d), base_r * math.sin(a + d))]
+        prism = common.poly_extrude(comp, tri, 0, hd + 80)[0]
+        # drawn in XY and extruded along +Z: rotate about X by -90 deg so the extrusion runs along +Y
+        tbm.transform(prism, compose(rot_about((1, 0, 0), -math.pi / 2), mat(0, y0 - 20, 0)))
+        keep = prism if keep is None else union_all([keep, prism])
+    tbm.booleanOperation(skin, keep, adsk.fusion.BooleanTypes.IntersectionBooleanType)
+    return skin
+
+
+def finial(y_top, h, r0=3.2):
+    parts = [vcyl(0, 0, y_top, y_top + 0.12 * h, r0 * 2.2, r0 * 1.6),
+             sphere((0, y_top + 0.22 * h, 0), r0 * 1.9),
+             vcyl(0, 0, y_top + 0.28 * h, y_top + h, r0, 0.4)]
+    return union_all(parts)
+
+
+def canopy_bodies(comp, R, lh, lt, rise, Rc, ch, t, fin_h, lappet_n=8):
+    R0 = R - 0.45 * lt
+    hd = rise - ch                                   # lip top -> crown ring foot (dome part)
+    ys = lh + hd
+    yt = ys + ch
+    outer = dome_points(R0, Rc, lh, hd)
+    inner = [(r - t * 1.15, y - t * 0.25) for (r, y) in outer]
+    segs = lip_segments(R, lh, lt) + [
+        ('P', (R0, lh)),
+        ('S', outer),
+        ('P', (Rc + 2.0, ys)),
+        ('P', (Rc + 2.0, ys + 0.55 * ch)),
+        ('P', (Rc + 7.0, ys + 0.70 * ch)),
+        ('P', (Rc + 7.0, ys + 0.86 * ch)),
+        ('P', (Rc + 4.0, yt)),
+        ('P', (0, yt)),
+        ('P', (0, yt - 12)),
+        ('P', (Rc - t, yt - 12)),
+        ('P', (inner[-1][0], inner[-1][1])),
+        ('S', [(r, y) for (r, y) in inner[-2::-1]] + [(R - lt, lh)]),
+    ]
+    shell = common.revolve_profile(comp, segs, 'shell')
+    parts = list(shell)
+    parts.append(dentil_ring(R, 0.25 * lh, 0.60 * lh))
+    # crown ring dentils
+    parts.append(dentil_ring(Rc + 6.5, ys + 0.30 * ch, ys + 0.50 * ch, depth=1.6, w=3.0, gap=2.2))
+    lap = lappets(comp, R0, Rc, lh, hd, n=lappet_n) if lappet_n else None
+    fin = finial(yt, fin_h)
+    return union_all(parts), lap, fin
+
+
+def drum_bodies(comp, R, lh, lt, drum_h, t):
+    R0 = R - 0.45 * lt
+    yd = lh + drum_h
+    segs = lip_segments(R, lh, lt) + [
+        ('P', (R0, lh)),
+        ('P', (R0, yd - 0.22 * drum_h)),
+        ('P', (R0 + 2.0, yd - 0.20 * drum_h)),      # cornice bed
+        ('P', (R0 + 2.0, yd - 0.12 * drum_h)),
+        ('P', (R0 + 6.5, yd - 0.08 * drum_h)),      # corona
+        ('P', (R0 + 6.5, yd - 0.02 * drum_h)),
+        ('P', (R0 + 4.5, yd)),
+        ('P', (0, yd)),
+        ('P', (0, yd - 16)),                         # deck slab
+        ('S', [(0.55 * R, yd - 0.30 * drum_h), (R - lt - 2, lh + 0.25 * drum_h)]),   # vaulted soffit
+        ('P', (R - lt, lh)),
+    ]
+    body = common.revolve_profile(comp, segs, 'drum')[0]
+    dent = dentil_ring(R0 + 2.4, yd - 0.19 * drum_h, yd - 0.12 * drum_h, depth=2.0, w=3.5, gap=2.4)
+    return union_all([body, dentil_ring(R, 0.25 * lh, 0.60 * lh), dent])
+
+
+def build(design, name, bodies_fn):
+    comp = common.new_definition_comp(design, name)
+    common.clear_comp(comp)
+    return comp, bodies_fn(comp)
+
+
+def run(_context: str):
+    doc, design = common.activate()
+    p = common.Params(design)
+    c, (shell, lap, fin) = build(design, 'Canopy', lambda comp: canopy_bodies(
+        comp, p.lip_d / 2, p.lip_h, p.lip_t, p.dome_rise, p.crown_d / 2, p.crown_h, p.shell_t, p.finial_h))
+    common.deposit(c, [shell], 'Canopy shell')
+    if lap:
+        common.deposit(c, [lap], 'Lotus lappets')
+    common.deposit(c, [fin], 'Finial')
+    k = p.ulip_d / p.lip_d
+    u, (ushell, ulap, ufin) = build(design, 'Upper Canopy', lambda comp: canopy_bodies(
+        comp, p.ulip_d / 2, p.lip_h * k, p.lip_t * k, p.udome_rise, p.crown_d / 2 * k, p.crown_h * k,
+        p.shell_t, p.ufinial_h))
+    common.deposit(u, [ushell], 'Upper canopy shell')
+    if ulap:
+        common.deposit(u, [ulap], 'Lotus lappets')
+    common.deposit(u, [ufin], 'Finial')
+    d, dbody = build(design, 'Drum', lambda comp: drum_bodies(
+        comp, p.lip_d / 2, p.lip_h, p.lip_t, p.drum_h, p.shell_t))
+    common.deposit(d, [dbody], 'Drum')
+    print('canopies built')

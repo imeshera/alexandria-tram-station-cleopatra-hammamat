@@ -1,0 +1,5 @@
+references/images/
+.DS_Store
+__pycache__/
+*.pyc
+tools/lettering/text2svg

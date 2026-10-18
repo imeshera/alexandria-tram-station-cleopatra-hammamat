@@ -62,3 +62,19 @@ Decisions, measurements and Fusion API gotchas, in the order they happened.
 - Exports: `export.py` deletes the canvases and the Library occurrence in memory, writes STEP and F3D, closes the
   document without saving and reopens it (the stored design keeps its underlay). F3D image check: none.
 - Renders: `render_views.py` (viewport, canvases hidden) → `docs/renders/2026-10-17_*.png`.
+
+## 2026-10-17 — Pass 2: urn canopies, cartouche, scale render
+- **Photo-matched check.** A model view set up like 01YNkcHynps t13m22 (camera in the car on the far track, ≈ 26°
+  yaw, ≈ 2.4 m above rail) next to the frame showed the canopies were wrong: they are **urns** — a convex bowl below
+  the lip resting on the beams, the lip at the equator, and a lower dome cap — not half-domes sitting on the lip.
+  Reworked `build_canopy.py`: bowl (0.55 m) from a bottom rim Ø 2.44 m (bearing ≈ 8 cm on each neighbouring beam)
+  with a 0.12 m concave soffit dish, lip at the equator, dome rise 1.85 → 1.25 m; upper canopy and drum get the
+  same bowl. Tall-unit heights follow `bowl_h`. Overall crown height barely changed (4.83 → 4.78 m).
+- The canopies are now modelled solid (outer surfaces only): a closed internal void would be useless for printing.
+- Cartouche enlarged to the photographed proportions (tablet 1.52 × 1.12 m, attic 0.40 m) and the lettering with it.
+- Drum plaque had been placed 7.5 cm inside the drum wall (only the frame edges showed); moved out to the wall face.
+- Scale render: `render_with_car.py` imports `Raml Car 223.step` from the 221-223 repository (same axis convention),
+  stands it on the NE platform track, renders and deletes it. The car roof (≈ 3.4 m) reaches just under the canopy
+  bowls (3.8 m above rail), as in the 2024 frames with cars at the platform (3nKi0T8XbfM).
+- Pattern for long MCP calls: the script writes a flag file at the end; the shell waits for the flag
+  (`until [ -f flag ]`) instead of guessing a sleep.

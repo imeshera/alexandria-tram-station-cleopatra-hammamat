@@ -32,7 +32,7 @@ balustrades, benches, double track and overhead line. Modelled as it stood, inta
 |---|---|
 | Columns (32) | Scamozzi-type Ionic: square plinth, Attic base (torus–scotia–torus), shaft with entasis, astragal, egg-and-dart echinus, four diagonal volutes with raised spirals and eyes, concave-sided abacus |
 | Frames (16) | Two columns across the platform under a transverse entablature: two-fascia architrave, frieze with a row of dentil blocks, corona and cyma, wrapped round all four faces |
-| Canopies (12 + 2 upper) | Hollow cast RC shells (80 mm) spanning between neighbouring frames: moulded lip band with bead, dentils and ovolo; pot/bell dome; eight raised lotus lappets hanging from the dentilled crown ring; finial spike; concave soffit |
+| Canopies (12 + 2 upper) | Cast RC urns spanning between neighbouring frames: convex bowl with a concave soffit dish bearing on the two beams, moulded equator lip with bead, dentils and ovolo, dome cap with eight raised lotus lappets hanging from the dentilled crown ring, finial spike |
 | Two-tier unit (×2) | Drum with dentilled cornice and flat deck, framed "كليوباترا" plaque, four Ionic colonnettes, square upper entablature, upper dome with its own crown, finial and cartouche |
 | Cartouche (×2 per side) | Attic block with framed credit line, oval tablet with laurel wreath and three roses, raised Arabic lettering (CoreText → SVG outlines) |
 | Platforms (×2) | 4.2 m platforms, 0.5 m above rail, end ramp, coping, 40 cm paving with joints, tactile band |
@@ -48,6 +48,10 @@ rotated 180° about the crossing centre).
 
 ![Two-tier unit](docs/renders/2026-10-17_two-tier-unit.png)
 
+![Cartouche end with the sponsor's tablet](docs/renders/2026-10-17_cartouche-detail.png)
+
+![Scale: Raml car 223 at the NE platform](docs/renders/2026-10-17_scale-raml-car-223-iso.png)
+
 ## Key dimensions
 No drawings survive in public. Everything except the gauge is photogrammetry from the owner's night photos (March
 2026), YouTube daylight frames (2022–2026) and Esri imagery. Full sheet with methods:
@@ -61,13 +65,13 @@ No drawings survive in public. Everything except the gauge is photogrammetry fro
 | Column, plinth bottom → abacus top / lower diameter | 2.40 m / 0.34 m (H/D 7.1) | LOW-MED (ratio MEDIUM) |
 | Column spacing across a frame | 1.30 m | LOW-MED |
 | Entablature | 0.38 m | LOW-MED |
-| Dome rise (lip top → crown top) / crown ring | 1.85 m / Ø 1.50 m | LOW |
-| Low canopy, platform → crown top | 4.83 m (+ 0.42 m finial) | LOW |
-| Two-tier unit, platform → crown top | 7.18 m (+ 0.65 m finial) | LOW |
+| Bowl below the lip / dome rise above it / crown ring | 0.55 m / 1.25 m / Ø 1.50 m | LOW-MED / LOW / LOW-MED |
+| Low canopy, platform → crown top | 4.78 m (+ 0.42 m finial) | LOW |
+| Two-tier unit, platform → crown top | 7.15 m (+ 0.65 m finial) | LOW |
 | Platform height above rail / width | 0.50 m / 4.20 m | MED-LOW / LOW |
 | Track gauge / track centres | 1435 mm / 3.8 m | HIGH / LOW |
 | Crossing centre → first frame | 17 m | LOW |
-| RC shell thickness | 80 mm | MED-LOW |
+| RC shell thickness (documented; canopies modelled solid) | 80 mm | MED-LOW |
 
 Every dimension is a Fusion user parameter whose comment records its source and confidence.
 
@@ -90,9 +94,9 @@ Loader, component structure and build order: [`fusion/README.md`](fusion/README.
 
 ## 3D printing
 - The model is a **1:1 master**; scale on export (1:87 → a 19.95 m colonnade is 229 mm; 1:150 → 133 mm).
-- All parts are closed solids with real thicknesses (80 mm shells, 12 mm contact wire). Below about 1:50 the dentils
+- All parts are closed solids with real thicknesses (canopies solid, 12 mm contact wire). Below about 1:50 the dentils
   (40 mm), lappets (20 mm proud), balusters and lettering (15–20 mm relief) fall under printable size: thicken,
-  simplify or drop them in a print variant. The domes print best as separate parts, upside down (open soffit up).
+  simplify or drop them in a print variant. The canopies print best as separate parts.
 - Overlapping solids (instances meeting at the lips, paving over the platform body) should be combined or
   separated per print plan; the track, street and OCS are separate components that can be left out.
 

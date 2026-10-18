@@ -3,7 +3,7 @@
 #                    half a pitch further on (each canopy rests on two neighbouring frames; lips touch above them).
 #   "Tall Unit"      two-tier unit: Drum (lower canopy) + 'Plaque' on its track side + four Colonnettes on the
 #                    drum deck + square upper entablature + Upper Canopy + tablet-only 'Cartouche Upper' facing -X.
-#                    Local origin at the drum lip bottom.
+#                    Local origin at the drum bowl bottom.
 #   "Tall Module"    Frame at x = 0 + Tall Unit half a pitch on.
 # Local frames: X along the track (+X away from the level crossing), Z across (+Z = track side), Y up.
 import os, sys, math
@@ -40,8 +40,8 @@ def run(_context: str):
     common.clear_comp(tu)
     place(tu, common.find_comp(design, 'Drum'), mat(0, 0, 0))
     R0 = p.lip_d / 2 - 0.45 * p.lip_t
-    place(tu, common.find_comp(design, 'Plaque'), mat(0, p.lip_h + 0.45 * p.drum_h, R0 + 0.5))
-    yd = p.lip_h + p.drum_h
+    place(tu, common.find_comp(design, 'Plaque'), mat(0, p.bowl_h + p.lip_h + 0.45 * p.drum_h, R0 + 0.5))
+    yd = p.bowl_h + p.lip_h + p.drum_h
     uw = p.ucol_w / 2
     col = common.find_comp(design, 'Colonnette')
     for sx in (-1, 1):
@@ -60,7 +60,7 @@ def run(_context: str):
     place(tu, common.find_comp(design, 'Upper Canopy'), mat(0, y_u, 0))
     k = p.ulip_d / p.lip_d
     uR0 = p.ulip_d / 2 - 0.45 * p.lip_t * k
-    place(tu, common.find_comp(design, 'Cartouche Upper'), mat(-(uR0 - 4.0), y_u + p.lip_h * k - 34, 0))
+    place(tu, common.find_comp(design, 'Cartouche Upper'), mat(-(uR0 - 4.0), y_u + (p.bowl_h + p.lip_h) * k - 40, 0))
 
     tm = common.new_definition_comp(design, 'Tall Module')
     common.clear_comp(tm)

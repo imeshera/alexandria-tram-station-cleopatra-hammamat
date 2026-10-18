@@ -52,7 +52,7 @@ persist in the parametric design (moving nested occurrences afterwards does not 
 | 1 | `params.py` | the user parameter table (creates or updates expressions and comments) |
 | 2 | `build_column.py` | Column and Colonnette: plinth, Attic base, shaft with entasis, astragal, egg-and-dart echinus, 4 diagonal volutes with raised spirals, concave abacus |
 | 3 | `build_frame.py` | Frame: two columns + entablature (2 fasciae, dentilled frieze, corona, cyma) |
-| 4 | `build_canopy.py` | Canopy, Upper Canopy (hollow pot-shaped RC shells: moulded dentilled lip, lotus lappets, crown ring, finial) and Drum |
+| 4 | `build_canopy.py` | Canopy, Upper Canopy (urns: convex bowl with soffit dish, moulded dentilled lip, dome cap with lotus lappets, crown ring, finial) and Drum |
 | 5 | `build_ornaments.py` | Cartouche (attic + credit line + oval laurel wreath tablet with sponsor text), Cartouche Upper, Plaque "كليوباترا", Bench, Baluster |
 | 6 | `build_modules.py` | Canopy Module, Tall Unit, Tall Module |
 | 7 | `build_side.py` | Station Side and its two root occurrences |
@@ -60,6 +60,7 @@ persist in the parametric design (moving nested occurrences afterwards does not 
 | 9 | `build_appearance.py` | weathered render colours, stained soffits, grime on column bases, lettering, paving, steel |
 | – | `canvases.py` | calibrated satellite underlay (plan check); removed from published exports |
 | – | `snap.py` | `snap(path, eye, target, ...)` viewport images with an explicit camera |
+| – | `render_views.py` / `render_with_car.py` | renders into `docs/renders/`; the second imports the published STEP of Raml Car 223 for scale and deletes it again |
 | – | `export.py` | STEP export and an F3D export with all canvases deleted in memory, then the document is closed without saving |
 
 Changing `pitch`, `n_can`, `tall_idx`, `col_h` etc.: re-run `params.py`, then the scripts from the first one that

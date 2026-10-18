@@ -24,10 +24,12 @@ The night photos could not show how the canopies are carried. The daylight frame
   every canopy lip reads as an arch whose feet sit on two consecutive beam blocks, and the dome centres lie midway
   between frames. The lips of neighbouring canopies meet above each beam. So **N canopies stand on N + 1 frames**,
   and the lip diameter equals the frame pitch.
-- **The canopies are hollow cast shells.** From below you look up into a concave soffit; the far half of the lip
-  shows as the "flat bottom" of the bowl (LjFTTQorR9o t06m38, t07m00; the upper dome of the tall unit shows its
-  full lip ellipse and hollow interior). The broken canopy in Wi4t1OngdrE t03m36 shows a thin RC shell (≈ 8 cm)
-  on a rebar cage.
+- **The canopies are urns, not half-domes.** A model view set up like YouTube 01YNkcHynps t13m22 showed that a
+  plain dome on the lip was wrong: every canopy has a **convex bowl below the lip** ("neck", ≈ 0.55 m deep) whose
+  bottom rim bears on the two neighbouring beams, the moulded **lip band at the equator**, and a **lower dome cap**
+  above it (≈ 1.25 m to the crown top). Under the bowl is a shallow **concave soffit dish** (lit dish with a darker
+  rim in the owner's night shots). The broken canopy in Wi4t1OngdrE t03m36 shows a thin RC shell (≈ 8 cm) on a
+  rebar cage; the model keeps the outer surfaces and is solid inside.
 - **Capitals are four-faced (Scamozzi-type) Ionic**, with volutes on the diagonals: volutes show both on the
   track-side views and on the along-platform views (6IYrh, LjFT t05m58).
 
@@ -68,14 +70,15 @@ in count, with the correction that the two-tier unit *replaces* the 4th canopy (
 | Entablature | 0.38 m (architrave 2 fasciae, frieze with dentil blocks, corona + cyma) | DOS 0.16 H; frames LjFT t06m02, t05m58 | LOW-MED |
 | Beam | 0.50 m deep × 1.90 m long | abacus width + overhang | LOW |
 | Lip band | 0.20 m high, 0.16 m wide, dentils 40/26 mm | LjFT t06m02 | LOW-MED |
-| Dome rise, lip top → crown top | 1.85 m (0.65 × lip) | hBRSK t21m06 side-on 0.72–0.77, LjFT t06m58 from below 0.58 | LOW |
+| Bowl below the lip / bottom rim / soffit dish | 0.55 m / Ø 2.44 m / 0.12 m rise | 01YNk t13m22 (bowl ≈ 0.23 of the column height), model overlay | LOW-MED / LOW / LOW |
+| Dome rise, lip top → crown top | 1.25 m (0.44 × lip) | 01YNk t13m22 overlay (≈ 0.5 of the column height), hBRSK t21m06 | LOW |
 | Crown ring | Ø 1.50 m × 0.30 m, dentilled | LjFT t06m58 (≈ 0.53 lip) | LOW-MED |
 | Shell thickness | 80 mm | Wi4t1 t03m36 | MED-LOW |
-| Low canopy, platform → crown top | 4.83 m (+ 0.42 m finial) | sum | LOW |
+| Low canopy, platform → crown top | 4.78 m (+ 0.42 m finial) | sum; DOS estimate 5.5–6 m | LOW |
 | Drum wall above the lip | 0.60 m + cornice, flat deck | LjFT t07m00 | LOW |
 | Upper colonnettes | 1.40 m, Ø 0.22 m, square 1.30 m c–c | 01YNk t13m22 (≈ 0.55–0.6 of the main columns) | LOW |
-| Upper entablature / lip / dome rise | 0.30 m / Ø 2.50 m / 1.65 m | LjFT t07m00 (upper lip ≈ drum width) | LOW |
-| Two-tier unit, platform → crown top / finial | 7.18 m / 7.83 m | sum; DOS estimate 8–9 m | LOW |
+| Upper entablature / lip / bowl / dome rise | 0.30 m / Ø 2.50 m / 0.48 m / 1.15 m | LjFT t07m00 (upper lip ≈ drum width), 01YNk t13m22 | LOW |
+| Two-tier unit, platform → crown top / finial | 7.15 m / 7.80 m | sum; DOS estimate 8–9 m | LOW |
 | Balustrade | 0.95 m; piers 0.36 m at 2.85 m; balusters at 0.22 m | YT people/benches, Wi4t1 piers | LOW-MED |
 | Benches | 1.60 × 0.42 m, seat 0.45 m | YT LjFT t06m58, 01YNk t13m21 | LOW |
 

@@ -1,10 +1,13 @@
-# Cast reinforced-concrete bell / half-dome canopies (revolved shells), as instancing definitions:
-#   "Canopy"        lower canopy: moulded lip band with dentils + ovolo, hollow pot-shaped dome (concave soffit
-#                   seen from below), raised lotus lappets hanging from the crown, crown ring with cornice, finial.
-#   "Drum"          lower tier of the two-tier unit: same lip, vertical drum wall with a dentilled cornice and a
-#                   flat deck carrying the colonnettes; vaulted soffit underneath.
-#   "Upper Canopy"  the two-tier unit's upper dome (smaller lip, taller finial).
-# Local frame: origin at the centre of the lip bottom (= top of the entablature), Y up.
+# Cast reinforced-concrete urn / bell canopies (revolved solids), as instancing definitions:
+#   "Canopy"        lower canopy: convex bowl ("neck") resting on two neighbouring entablatures, with a shallow
+#                   concave soffit dish underneath; moulded lip band at the equator (bead, dentils, ovolo);
+#                   pot-shaped dome with raised lotus lappets hanging from the dentilled crown ring; finial.
+#   "Drum"          lower tier of the two-tier unit: same bowl and lip, vertical drum wall with a dentilled
+#                   cornice and a flat deck carrying the colonnettes.
+#   "Upper Canopy"  the two-tier unit's upper canopy (scaled lip/bowl, taller finial).
+# Local frame: origin at the centre of the bowl bottom (= top of the entablature), Y up.
+# The canopies are modelled solid (the real shells are ~80 mm RC around a void; a closed void is useless for
+# printing and invisible), with the concave soffit dish and all outer mouldings.
 import os, sys, math
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import importlib, common
@@ -13,17 +16,30 @@ from common import box, vcyl, cyl, sphere, torus, union_all, moved, rot_about, c
 import adsk.core, adsk.fusion
 
 
-def lip_segments(R, lh, lt):
-    """Outer lip profile from the inner bottom corner up to the top ledge (r, y)."""
+def lip_segments(R, lh, y0):
+    """Outer lip band profile (r, y) from its bottom (y0) to its top ledge."""
     return [
-        ('P', (R - lt, 0)),
-        ('P', (R - 1.5, 0)),
-        ('S', [(R - 0.3, 0.06 * lh), (R - 0.8, 0.16 * lh)]),     # bottom bead
-        ('P', (R - 3.2, 0.20 * lh)),
-        ('P', (R - 3.2, 0.64 * lh)),                              # recessed dentil zone
-        ('P', (R - 1.8, 0.68 * lh)),
-        ('S', [(R + 0.2, 0.80 * lh), (R - 1.2, 0.95 * lh)]),      # ovolo
-        ('P', (R - 1.2, lh)),
+        ('P', (R - 1.5, y0)),
+        ('S', [(R - 0.3, y0 + 0.06 * lh), (R - 0.8, y0 + 0.16 * lh)]),     # bottom bead
+        ('P', (R - 3.2, y0 + 0.20 * lh)),
+        ('P', (R - 3.2, y0 + 0.64 * lh)),                                  # recessed dentil zone
+        ('P', (R - 1.8, y0 + 0.68 * lh)),
+        ('S', [(R + 0.2, y0 + 0.80 * lh), (R - 1.2, y0 + 0.95 * lh)]),      # ovolo
+        ('P', (R - 1.2, y0 + lh)),
+    ]
+
+
+def bowl_segments(R, Rb, bh, dish):
+    """From the soffit centre: concave dish out to the bottom rim (Rb), then the convex bowl up to the lip."""
+    lip_r = R - 3.0
+    return [
+        ('P', (0, dish)),
+        ('S', [(0.45 * Rb, 0.82 * dish), (Rb - 14, 2.0)]),
+        ('P', (Rb - 6, 0)),
+        ('P', (Rb, 0)),
+        ('S', [(Rb + 0.42 * (lip_r - Rb), 0.08 * bh), (Rb + 0.80 * (lip_r - Rb), 0.36 * bh),
+               (lip_r - 0.6, 0.78 * bh), (lip_r, bh - 2.0)]),
+        ('P', (R - 1.5, bh)),
     ]
 
 
@@ -74,15 +90,15 @@ def finial(y_top, h, r0=3.2):
     return union_all(parts)
 
 
-def canopy_bodies(comp, R, lh, lt, rise, Rc, ch, t, fin_h, lappet_n=8):
+def canopy_bodies(comp, R, Rb, bh, dish, lh, lt, rise, Rc, ch, fin_h, lappet_n=8):
     R0 = R - 0.45 * lt
-    hd = rise - ch                                   # lip top -> crown ring foot (dome part)
-    ys = lh + hd
+    y_l = bh + lh                                  # lip top
+    hd = rise - ch                                 # lip top -> crown ring foot
+    ys = y_l + hd
     yt = ys + ch
-    outer = dome_points(R0, Rc, lh, hd)
-    inner = [(r - t * 1.15, y - t * 0.25) for (r, y) in outer]
-    segs = lip_segments(R, lh, lt) + [
-        ('P', (R0, lh)),
+    outer = dome_points(R0, Rc, y_l, hd)
+    segs = bowl_segments(R, Rb, bh, dish) + lip_segments(R, lh, bh)[1:] + [
+        ('P', (R0, y_l)),
         ('S', outer),
         ('P', (Rc + 2.0, ys)),
         ('P', (Rc + 2.0, ys + 0.55 * ch)),
@@ -90,26 +106,22 @@ def canopy_bodies(comp, R, lh, lt, rise, Rc, ch, t, fin_h, lappet_n=8):
         ('P', (Rc + 7.0, ys + 0.86 * ch)),
         ('P', (Rc + 4.0, yt)),
         ('P', (0, yt)),
-        ('P', (0, yt - 12)),
-        ('P', (Rc - t, yt - 12)),
-        ('P', (inner[-1][0], inner[-1][1])),
-        ('S', [(r, y) for (r, y) in inner[-2::-1]] + [(R - lt, lh)]),
     ]
-    shell = common.revolve_profile(comp, segs, 'shell')
-    parts = list(shell)
-    parts.append(dentil_ring(R, 0.25 * lh, 0.60 * lh))
-    # crown ring dentils
+    body = common.revolve_profile(comp, segs, 'canopy')
+    parts = list(body)
+    parts.append(dentil_ring(R, bh + 0.25 * lh, bh + 0.60 * lh))
     parts.append(dentil_ring(Rc + 6.5, ys + 0.30 * ch, ys + 0.50 * ch, depth=1.6, w=3.0, gap=2.2))
-    lap = lappets(comp, R0, Rc, lh, hd, n=lappet_n) if lappet_n else None
+    lap = lappets(comp, R0, Rc, y_l, hd, n=lappet_n) if lappet_n else None
     fin = finial(yt, fin_h)
     return union_all(parts), lap, fin
 
 
-def drum_bodies(comp, R, lh, lt, drum_h, t):
+def drum_bodies(comp, R, Rb, bh, dish, lh, lt, drum_h):
     R0 = R - 0.45 * lt
-    yd = lh + drum_h
-    segs = lip_segments(R, lh, lt) + [
-        ('P', (R0, lh)),
+    y_l = bh + lh
+    yd = y_l + drum_h
+    segs = bowl_segments(R, Rb, bh, dish) + lip_segments(R, lh, bh)[1:] + [
+        ('P', (R0, y_l)),
         ('P', (R0, yd - 0.22 * drum_h)),
         ('P', (R0 + 2.0, yd - 0.20 * drum_h)),      # cornice bed
         ('P', (R0 + 2.0, yd - 0.12 * drum_h)),
@@ -117,13 +129,10 @@ def drum_bodies(comp, R, lh, lt, drum_h, t):
         ('P', (R0 + 6.5, yd - 0.02 * drum_h)),
         ('P', (R0 + 4.5, yd)),
         ('P', (0, yd)),
-        ('P', (0, yd - 16)),                         # deck slab
-        ('S', [(0.55 * R, yd - 0.30 * drum_h), (R - lt - 2, lh + 0.25 * drum_h)]),   # vaulted soffit
-        ('P', (R - lt, lh)),
     ]
     body = common.revolve_profile(comp, segs, 'drum')[0]
     dent = dentil_ring(R0 + 2.4, yd - 0.19 * drum_h, yd - 0.12 * drum_h, depth=2.0, w=3.5, gap=2.4)
-    return union_all([body, dentil_ring(R, 0.25 * lh, 0.60 * lh), dent])
+    return union_all([body, dentil_ring(R, bh + 0.25 * lh, bh + 0.60 * lh), dent])
 
 
 def build(design, name, bodies_fn):
@@ -135,21 +144,22 @@ def build(design, name, bodies_fn):
 def run(_context: str):
     doc, design = common.activate()
     p = common.Params(design)
+    R, Rb = p.lip_d / 2, p.bowl_d / 2
     c, (shell, lap, fin) = build(design, 'Canopy', lambda comp: canopy_bodies(
-        comp, p.lip_d / 2, p.lip_h, p.lip_t, p.dome_rise, p.crown_d / 2, p.crown_h, p.shell_t, p.finial_h))
+        comp, R, Rb, p.bowl_h, p.dish_d, p.lip_h, p.lip_t, p.dome_rise, p.crown_d / 2, p.crown_h, p.finial_h))
     common.deposit(c, [shell], 'Canopy shell')
     if lap:
         common.deposit(c, [lap], 'Lotus lappets')
     common.deposit(c, [fin], 'Finial')
     k = p.ulip_d / p.lip_d
     u, (ushell, ulap, ufin) = build(design, 'Upper Canopy', lambda comp: canopy_bodies(
-        comp, p.ulip_d / 2, p.lip_h * k, p.lip_t * k, p.udome_rise, p.crown_d / 2 * k, p.crown_h * k,
-        p.shell_t, p.ufinial_h))
+        comp, R * k, Rb * k, p.bowl_h * k, p.dish_d * k, p.lip_h * k, p.lip_t * k, p.udome_rise,
+        p.crown_d / 2 * k, p.crown_h * k, p.ufinial_h))
     common.deposit(u, [ushell], 'Upper canopy shell')
     if ulap:
         common.deposit(u, [ulap], 'Lotus lappets')
     common.deposit(u, [ufin], 'Finial')
     d, dbody = build(design, 'Drum', lambda comp: drum_bodies(
-        comp, p.lip_d / 2, p.lip_h, p.lip_t, p.drum_h, p.shell_t))
+        comp, R, Rb, p.bowl_h, p.dish_d, p.lip_h, p.lip_t, p.drum_h))
     common.deposit(d, [dbody], 'Drum')
     print('canopies built')

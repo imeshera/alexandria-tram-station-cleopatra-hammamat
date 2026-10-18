@@ -2,7 +2,7 @@
 #   "Cartouche"  attic block on the crossing-end entablature carrying the designer's credit line
 #                ("تصميم المعماري م/ ..." - name illegible, not cut) and the oval laurel-and-rose wreath tablet
 #                with the sponsor text "شركة / قصر السلام / ..." (third line illegible, left blank).
-#                Local frame: origin at the attic bottom on the entablature top, back face on x = 0, faces -X.
+#                Local frame: origin at the attic bottom on the entablature top (attic 40 cm, tablet 1.52 x 1.12 m), back face on x = 0, faces -X.
 #   "Plaque"     framed name plate "كليوباترا" on the drum of the two-tier unit; faces +Z.
 #   "Bench"      pink terrazzo bench: slab with a rounded nosing on two waisted pedestals; local origin at floor.
 #   "Baluster"   turned vase baluster with square plinth and abacus; local origin at its foot.
@@ -33,17 +33,17 @@ def cartouche(comp, attic=True):
     parts, text = [], []
     if attic:
         # attic block with a small cornice and a bordered credit panel
-        parts.append(box(-62, 62, 0, 30, 0, 24))
-        parts.append(box(-66, 66, 30, 34, 0, 28))
-        parts.append(box(-64, 64, 0, 3, 0, 26))
-        fr_out = box(-52, 52, 5, 27, 23.5, 25.0)
-        tbm.booleanOperation(fr_out, box(-49.5, 49.5, 7.5, 24.5, 23, 26), adsk.fusion.BooleanTypes.DifferenceBooleanType)
+        parts.append(box(-74, 74, 0, 36, 0, 26))
+        parts.append(box(-78, 78, 36, 40, 0, 30))
+        parts.append(box(-76, 76, 0, 3, 0, 28))
+        fr_out = box(-64, 64, 6, 32, 25.5, 27.0)
+        tbm.booleanOperation(fr_out, box(-61.5, 61.5, 8.5, 29.5, 25, 28), adsk.fusion.BooleanTypes.DifferenceBooleanType)
         parts.append(fr_out)
-        for b in common.svg_text(comp, common.svg_path('credit.svg'), 18, 10.5, 9.5, 1.5, max_w=58):
-            tbm.transform(b, mat(0, 0, 24))
+        for b in common.svg_text(comp, common.svg_path('credit.svg'), 22, 12.5, 11.0, 1.5, max_w=72):
+            tbm.transform(b, mat(0, 0, 26))
             text.append(b)
     # oval tablet: back plate, rim, laurel wreath, three roses, sponsor text
-    a, b_, cy = 62.0, 46.0, 34 + 46
+    a, b_, cy = 76.0, 56.0, 40 + 56
     parts.append(oval_plate(comp, a, b_, cy, 4, 14))
     parts.append(oval_ring(comp, a, b_, 8.5, cy, 14, 16.5))
     # laurel wreath: pairs of leaves set herringbone-fashion along the oval, tips pointing up both sides
@@ -63,14 +63,14 @@ def cartouche(comp, attic=True):
             parts.append(leaf)
     for (u, r) in ((0, 6.5), (-13, 5.2), (13, 5.2)):
         parts.append(sphere((u, cy - b_ + 6, 19.0), r))
-    for bb in common.svg_text(comp, common.svg_path('cart_l1.svg'), 0, cy + 18, 11.0, 1.8, max_w=40):
+    for bb in common.svg_text(comp, common.svg_path('cart_l1.svg'), 0, cy + 22, 13.0, 1.8, max_w=48):
         tbm.transform(bb, mat(0, 0, 14))
         text.append(bb)
-    for bb in common.svg_text(comp, common.svg_path('cart_l2.svg'), 0, cy - 12, 26.0, 1.8, max_w=96):
+    for bb in common.svg_text(comp, common.svg_path('cart_l2.svg'), 0, cy - 15, 32.0, 1.8, max_w=118):
         tbm.transform(bb, mat(0, 0, 14))
         text.append(bb)
     # third line: illegible in every frame -> plain raised band only
-    parts.append(box(-30, 30, cy - 25, cy - 18, 14, 14.6))
+    parts.append(box(-38, 38, cy - 31, cy - 23, 14, 14.6))
     body = union_all(parts)
     tbm.transform(body, TO_MINUS_X)
     for t in text:
